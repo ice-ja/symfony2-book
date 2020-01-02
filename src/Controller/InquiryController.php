@@ -12,6 +12,7 @@ use Symfony\Component\Form\Extension\Core\Type\{
 };
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
+use App\Entity\Inquiry;
 
 /**
  * @Route("/inquiry")
@@ -23,7 +24,6 @@ class InquiryController extends AbstractController
      */
     public function index()
     {
-
         return $this->render('inquiry/index.html.twig', [
             'form' => $this->createInquiryForm()->createView()
         ]);
@@ -38,7 +38,20 @@ class InquiryController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isValid()) {
-            $data = $form->getData();
+
+//            $data = $form->getData();
+//            $inquiry = new Inquiry();
+//            $inquiry->setName($data['name']);
+//            $inquiry->setEmail($data['email']);
+//            $inquiry->setTel($data['tel']);
+//            $inquiry->setType($data['type']);
+//            $inquiry->setContent($data['content']);
+            $inquiry = $form->getData();
+
+            $em = $this->getDoctrine()->getManager();
+
+            $em->persist($inquiry);
+            $em->flush();
 
             $email = (new TemplatedEmail())
                 ->from('webmaster@example.com')
@@ -46,7 +59,7 @@ class InquiryController extends AbstractController
                 ->subject('Webサイトからのお知らせ')
                 ->textTemplate('mail/inquiry.txt.twig')
                 ->context([
-                    'data' => $data
+                    'data' => $inquiry
                 ]);
 
             // メールが送信されないようコメントアウトした
@@ -69,7 +82,7 @@ class InquiryController extends AbstractController
 
     private function createInquiryForm()
     {
-        return $this->createFormBuilder()
+        return $this->createFormBuilder(new Inquiry())
             ->add('name', TextType::class)
             ->add('email', TextType::class)
             ->add('tel', TextType::class, [
