@@ -1,0 +1,91 @@
+<?php
+
+namespace App\Controller;
+
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Form\Extension\Core\Type\{
+    TextType,
+    ChoiceType,
+    SubmitType
+};
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Bridge\Twig\Mime\TemplatedEmail;
+
+/**
+ * @Route("/inquiry")
+ */
+class InquiryController extends AbstractController
+{
+    /**
+     * @Route("/", methods={"GET"})
+     */
+    public function index()
+    {
+
+        return $this->render('inquiry/index.html.twig', [
+            'form' => $this->createInquiryForm()->createView()
+        ]);
+    }
+
+    /**
+     * @Route("/", methods={"POST"})
+     */
+    public function indexPost(Request $request, MailerInterface $mailer)
+    {
+        $form = $this->createInquiryForm();
+        $form->handleRequest($request);
+
+        if ($form->isValid()) {
+            $data = $form->getData();
+
+            $email = (new TemplatedEmail())
+                ->from('webmaster@example.com')
+                ->to('test@example.com')
+                ->subject('Webサイトからのお知らせ')
+                ->textTemplate('mail/inquiry.txt.twig')
+                ->context([
+                    'data' => $data
+                ]);
+
+            // メールが送信されないようコメントアウトした
+            // $mailer->send($email);
+            return $this->redirectToRoute('app_inquiry_complete');
+        }
+
+        return $this->render('inquiry/index.html.twig', [
+            'form' => $this->createInquiryForm()->createView()
+        ]);
+    }
+
+    /**
+     * @Route("/complete")
+     */
+    public function complete()
+    {
+        return $this->render('inquiry/complete.html.twig');
+    }
+
+    private function createInquiryForm()
+    {
+        return $this->createFormBuilder()
+            ->add('name', TextType::class)
+            ->add('email', TextType::class)
+            ->add('tel', TextType::class, [
+                'required' => false,
+            ])
+            ->add('type', ChoiceType::class, [
+                'choices' => [
+                    '公演について' => 0,
+                    'その他' => 1,
+                ],
+                'expanded' => true,
+            ])
+            ->add('content', TextType::class)
+            ->add('submit', SubmitType::class, [
+                'label' => '送信',
+            ])
+            ->getForm();
+    }
+}

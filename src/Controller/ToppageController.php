@@ -8,7 +8,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class ToppageController extends AbstractController
 {
     /**
-     * @Route("/", name="toppage")
+     * @Route("/")
      */
     public function index()
     {
