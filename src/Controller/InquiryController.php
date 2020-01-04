@@ -38,14 +38,6 @@ class InquiryController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isValid()) {
-
-//            $data = $form->getData();
-//            $inquiry = new Inquiry();
-//            $inquiry->setName($data['name']);
-//            $inquiry->setEmail($data['email']);
-//            $inquiry->setTel($data['tel']);
-//            $inquiry->setType($data['type']);
-//            $inquiry->setContent($data['content']);
             $inquiry = $form->getData();
 
             $em = $this->getDoctrine()->getManager();
@@ -68,7 +60,7 @@ class InquiryController extends AbstractController
         }
 
         return $this->render('inquiry/index.html.twig', [
-            'form' => $this->createInquiryForm()->createView()
+            'form' => $form->createView()
         ]);
     }
 
