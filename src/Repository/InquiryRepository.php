@@ -34,6 +34,16 @@ class InquiryRepository extends ServiceEntityRepository
         return new ArrayCollection($query->getResult());
     }
 
+    public function findUnprocessed(){
+        $query = $this->createQueryBuilder('i')
+            ->where('i.processStatus = :processStatus')
+            ->orWhere('i.processStatus is null')
+            ->orderBy('i.id', 'ASC')
+            ->setParameter('processStatus', 0)
+            ->getQuery();
+
+        return new ArrayCollection($query->getResult());
+    }
     // /**
     //  * @return Inquiry[] Returns an array of Inquiry objects
     //  */
