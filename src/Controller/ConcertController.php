@@ -41,7 +41,7 @@ class ConcertController extends AbstractController
                 'available' => true,
             ],
         ];
-
+$this->get('router');
         return $this->render('concert/index.html.twig',
             ['concertList' => $concertList]);
     }
